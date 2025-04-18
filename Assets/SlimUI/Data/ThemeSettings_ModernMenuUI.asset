@@ -16,7 +16,7 @@ MonoBehaviour:
     graphic1: {r: 0.15686275, g: 0.21176471, b: 0.09411765, a: 1}
     text1:
       serializedVersion: 2
-      rgba: 4281887840
+      rgba: 4294967295
   custom2:
     graphic2: {r: 0, g: 0.6677432, b: 1, a: 1}
     text2:
@@ -30,4 +30,4 @@ MonoBehaviour:
   currentColor: {r: 0.15686275, g: 0.21176471, b: 0.09411765, a: 1}
   textColor:
     serializedVersion: 2
-    rgba: 4281887840
+    rgba: 4294967295

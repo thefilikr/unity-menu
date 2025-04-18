@@ -3,6 +3,8 @@ using System.Collections;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
+using Slider = UnityEngine.UI.Slider;
 
 namespace SlimUI.ModernMenu{
 	public class UIMenuManager : MonoBehaviour {
@@ -44,7 +46,10 @@ namespace SlimUI.ModernMenu{
         public GameObject PanelCombat;
         [Tooltip("The UI Sub-Panel under KEY BINDINGS for GENERAL")]
         public GameObject PanelGeneral;
-        
+		public GameObject PanelLevl;
+
+        [Header("Модалка 'В разработке..'")]
+		public GameObject modal;
 
         // highlights in settings screen
         [Header("SETTINGS SCREEN")]
@@ -149,11 +154,25 @@ namespace SlimUI.ModernMenu{
 
 		public void Position2(){
 			DisablePlayCampaign();
+			PanelLevl.SetActive(false);
+			PanelControls.SetActive(true);
 			CameraObject.SetFloat("Animate",1);
+		}
+
+		public void Position3(){
+			DisablePlayCampaign();
+			PanelControls.SetActive(false);
+			PanelLevl.SetActive(true);
+			CameraObject.SetFloat("Animate",2);
 		}
 
 		public void Position1(){
 			CameraObject.SetFloat("Animate",0);
+		}
+
+		public void ModalSwith()
+		{
+			modal.SetActive(!modal.activeSelf);
 		}
 
 		void DisablePanels(){
