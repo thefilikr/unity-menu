@@ -953,17 +953,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 670967cb1a53d4114a4b3f32cece0c9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 0.01
-  smoothTime: 0.01
-  maxOffset: {x: 1, y: 1}
+  sensitivity: 0.1
+  smoothTime: 0.1
+  maxOffset: {x: 2, y: 1}
   parallaxLayers:
   - {fileID: 512266987}
   - {fileID: 1687210701}
   - {fileID: 1494813013}
   layerMultipliers:
-  - 0.3
-  - 0.7
-  - 0.1
+  - 1
+  - 1
+  - 1
   autoCalibrate: 1
   invertX: 0
   invertY: 1
