@@ -10680,6 +10680,7 @@ GameObject:
   - component: {fileID: 393194567049449570}
   - component: {fileID: 393905817044413330}
   - component: {fileID: 393768895130468394}
+  - component: {fileID: 415971625878361879}
   - component: {fileID: 309949197}
   m_Layer: 0
   m_Name: Camera
@@ -14718,6 +14719,57 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &415971625878361879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352696004719667332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6fe9ff0ebe5cb982bd7d5eb0e6f9d65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emptyStar: {fileID: 0}
+  filledStar: {fileID: 0}
+  levelButtons:
+  - button: {fileID: 5109660985936856096}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
+  - button: {fileID: 0}
+    stars: []
+    levelIndex: 0
+    levelName: 
 --- !u!82 &416334277783287588
 AudioSource:
   m_ObjectHideFlags: 0
