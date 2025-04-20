@@ -15,8 +15,8 @@ MonoBehaviour:
   levels:
   - LevelName: lvl_1
     timeGrade3: 1
-    timeGrade2: 1
-    timeGrade1: 1
+    timeGrade2: 2
+    timeGrade1: 3
   - LevelName: lvl_2
     timeGrade3: 1
     timeGrade2: 1

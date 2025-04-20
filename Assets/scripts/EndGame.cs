@@ -80,6 +80,16 @@ public class EndGame : MonoBehaviour
         int nowGrade = CalcGrade(completeTime);
         if (nowGrade > grade) grade = nowGrade;
 
+        // Отображаем время игрока
+        if (gameTimeTexts != null)
+        {
+            gameTimeTexts.text = "Ваше время: " + FormatTime(completeTime);
+        }
+        else
+        {
+            Debug.LogWarning("gameTimeTexts не назначен в инспекторе");
+        }
+
         // Отображаем время под звездами
         DisplayTimes(completeTime);
 
@@ -95,7 +105,6 @@ public class EndGame : MonoBehaviour
             {
                 stars[i].SetActive(true);
             }
-            // Invoke("ShowStars", 0.5f);
         }
 
         if (grade != 0) 
@@ -149,19 +158,25 @@ public class EndGame : MonoBehaviour
             level.timeGrade1
         };
 
-        // Отображаем время под каждой звездой
-        for (int i = 0; i < timeTexts.Length && i < starTimeThresholds.Length; i++)
+        // Проверяем, что массив текстов соответствует количеству звезд
+        if (timeTexts.Length < starTimeThresholds.Length)
         {
-            if (timeTexts[i] == null) continue;
+            Debug.LogError("Не хватает текстовых полей для отображения времени всех звезд");
+            return;
+        }
+
+        // Отображаем время под каждой звездой
+        for (int i = 0; i < starTimeThresholds.Length; i++)
+        {
+            if (timeTexts[i] == null)
+            {
+                Debug.LogError($"Не назначено текстовое поле для звезды {i+1}");
+                continue;
+            }
             
             // Устанавливаем текст с пороговым временем для звезды
             timeTexts[i].text = FormatTime(starTimeThresholds[i]);
-            
-            // Добавляем анимацию для текста
-            // if (timeTexts[i].TryGetComponent<Animator>(out var animator))
-            // {
-            //     animator.SetTrigger("Show");
-            // }
+            timeTexts[i].gameObject.SetActive(true); // Активируем текстовое поле
         }
     }
 
