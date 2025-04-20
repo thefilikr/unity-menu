@@ -33,16 +33,12 @@ public class EndGame : MonoBehaviour
     [SerializeField] private TMP_Text[] timeTexts;
     [SerializeField] private TMP_Text gameTimeTexts;
     [SerializeField] private string timeFormat = "mm':'ss'.'ff";
+    [SerializeField] private GameObject loseText; // Текст "Вы проиграли"
 
     [SerializeField] private Animator winScreenAnimator;
     [SerializeField] private Animator starsAnimator;
     [SerializeField] private string winScreenTrigger = "Show";
     [SerializeField] private string starsTrigger = "Show";
-
-    [Header("Цвета времени")]
-    [SerializeField] private Color completedTimeColor = Color.yellow; 
-    [SerializeField] private Color failedTimeColor = new Color(0.7f, 0.7f, 0.7f); 
-    [SerializeField] private Color defaultTimeColor = Color.white; 
 
     private const string GRADE = "_grade";
 
@@ -50,6 +46,7 @@ public class EndGame : MonoBehaviour
     {
         winScreenAnimator.gameObject.SetActive(false);
         winScreen.SetActive(false);
+        loseText.SetActive(false); // Скрываем текст проигрыша
         
         if (restartButton != null) restartButton.onClick.AddListener(RestartGame);
             
@@ -86,13 +83,21 @@ public class EndGame : MonoBehaviour
         // Отображаем время под звездами
         DisplayTimes(completeTime);
 
-        for (int i=0; i<grade; i++)
+        // Если нет звезд - показываем текст проигрыша
+        if (grade == 0)
         {
-            stars[i].SetActive(true);
+            loseText.SetActive(true);
+        }
+        else
+        {
+            // Показываем звезды, которые получил игрок
+            for (int i = 0; i < grade; i++)
+            {
+                stars[i].SetActive(true);
+            }
+            // Invoke("ShowStars", 0.5f);
         }
 
-        Invoke("ShowStars", 0.5f);
-        
         if (grade != 0) 
         {
             PlayerPrefs.SetInt($"Level_{level.LevelName}_Completed", 1);
@@ -108,7 +113,6 @@ public class EndGame : MonoBehaviour
 
     private int CalcGrade(float time)
     {
-        
         if (time <= level.timeGrade3) return 3;
         if (time <= level.timeGrade2) return 2;
         if (time <= level.timeGrade1) return 1;
@@ -130,10 +134,10 @@ public class EndGame : MonoBehaviour
         SceneManager.LoadScene(nextLevel);
     }
 
-    private void ShowStars()
-    {
-        starsAnimator.SetTrigger(starsTrigger);
-    }
+    // private void ShowStars()
+    // {
+    //     starsAnimator.SetTrigger(starsTrigger);
+    // }
     
     private void DisplayTimes(float playerTime)
     {
@@ -150,27 +154,14 @@ public class EndGame : MonoBehaviour
         {
             if (timeTexts[i] == null) continue;
             
-            // Устанавливаем базовый цвет
-            timeTexts[i].color = defaultTimeColor;
-            
             // Устанавливаем текст с пороговым временем для звезды
             timeTexts[i].text = FormatTime(starTimeThresholds[i]);
             
-            // Меняем цвет, если игрок уложился в это время
-            if (playerTime <= starTimeThresholds[i])
-            {
-                timeTexts[i].color = completedTimeColor;
-            }
-            else if (i == 0) // Для самого строгого времени можно особый цвет
-            {
-                timeTexts[i].color = failedTimeColor;
-            }
-            
             // Добавляем анимацию для текста
-            if (timeTexts[i].TryGetComponent<Animator>(out var animator))
-            {
-                animator.SetTrigger("Show");
-            }
+            // if (timeTexts[i].TryGetComponent<Animator>(out var animator))
+            // {
+            //     animator.SetTrigger("Show");
+            // }
         }
     }
 
@@ -180,7 +171,6 @@ public class EndGame : MonoBehaviour
         System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(time);
 
         // Форматируем время в минуты:секунды.сотые
-        // Используем стандартные форматеры без кавычек
         return string.Format("{0:00}:{1:00}.{2:00}",
             timeSpan.Minutes + timeSpan.Hours * 60,
             timeSpan.Seconds,

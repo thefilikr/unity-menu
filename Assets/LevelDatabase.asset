@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levels:
   - LevelName: lvl_1
-    timeGrade3: 60
-    timeGrade2: 90
-    timeGrade1: 120
+    timeGrade3: 1
+    timeGrade2: 1
+    timeGrade1: 1
   - LevelName: lvl_2
     timeGrade3: 1
-    timeGrade2: 20
-    timeGrade1: 30
+    timeGrade2: 1
+    timeGrade1: 1
