@@ -10,6 +10,8 @@ namespace SlimUI.ModernMenu{
 	public class UIMenuManager : MonoBehaviour {
 		private Animator CameraObject;
 
+		public Animator transport; 
+
 		// campaign button sub menu
         [Header("MENUS")]
         [Tooltip("The Menu for when the MAIN menu buttons")]
@@ -157,6 +159,9 @@ namespace SlimUI.ModernMenu{
 			PanelLevl.SetActive(false);
 			PanelControls.SetActive(true);
 			CameraObject.SetFloat("Animate",1);
+			transport.SetTrigger("start_tran");
+			transport.SetTrigger("start_car");
+			transport.SetTrigger("start_bake");
 		}
 
 		public void Position3(){
@@ -164,6 +169,9 @@ namespace SlimUI.ModernMenu{
 			PanelControls.SetActive(false);
 			PanelLevl.SetActive(true);
 			CameraObject.SetFloat("Animate",2);
+			transport.SetTrigger("start_tran");
+			transport.SetTrigger("start_car");
+			transport.SetTrigger("start_bake");
 		}
 
 		public void Position1(){
