@@ -11,7 +11,7 @@ public class GyroParallax : MonoBehaviour
 {
     [Header("Основные настройки")]
     [Range(0.01f, 1f)] public float sensitivity = 0.15f;
-    [Range(0.01f, 0.5f)] public float smoothTime = 0.1f;
+    [Range(0.01f, 10.0f)] public float smoothTime = 0.1f;
     public Vector2 maxOffset = new Vector2(1.5f, 1f);
 
     [Header("Слои паралакса")]
@@ -24,6 +24,7 @@ public class GyroParallax : MonoBehaviour
     public bool invertY = true;
 
     private Vector3[] initialLayerPositions;
+    private Vector3[] currentLayerOffsets;
     private Vector3 velocity;
     private Quaternion baseAttitude;
     private bool sensorsReady = false;
@@ -44,13 +45,15 @@ public class GyroParallax : MonoBehaviour
 
         if (parallaxLayers != null)
         {
-            if (initialLayerPositions == null)
+            initialLayerPositions = new Vector3[parallaxLayers.Length];
+            currentLayerOffsets = new Vector3[parallaxLayers.Length];
+            
+            for (int i = 0; i < parallaxLayers.Length; i++)
             {
-                initialLayerPositions = new Vector3[parallaxLayers.Length];
-                for (int i = 0; i < parallaxLayers.Length; i++)
+                if (parallaxLayers[i] != null)
                 {
-                    if (parallaxLayers[i] != null)
-                        initialLayerPositions[i] = parallaxLayers[i].localPosition;
+                    initialLayerPositions[i] = parallaxLayers[i].localPosition;
+                    currentLayerOffsets[i] = Vector3.zero;
                 }
             }
         }
@@ -58,19 +61,14 @@ public class GyroParallax : MonoBehaviour
 
     void Update()
     {
-        Vector3 targetPosition = CalculateTargetPosition();
-        targetPosition = ApplyLimits(targetPosition);
-
-        // transform.localPosition = Vector3.SmoothDamp(
-        //     transform.localPosition,
-        //     targetPosition,
-        //     ref velocity,
-        //     smoothTime);
+        Vector3 movement = CalculateMovement();
+        Vector3 targetPosition = ApplyLimits(movement);
+        lastTargetPosition = targetPosition;
 
         ApplyParallaxEffect(targetPosition);
     }
 
-    private Vector3 CalculateTargetPosition()
+    private Vector3 CalculateMovement()
     {
         if (sensorsReady && AttitudeSensor.current != null)
         {
@@ -90,8 +88,8 @@ public class GyroParallax : MonoBehaviour
 #if UNITY_EDITOR
         if (!Application.isMobilePlatform)
         {
-            float mouseX = Mouse.current.delta.x.ReadValue() * sensitivity * 0.1f;
-            float mouseY = Mouse.current.delta.y.ReadValue() * sensitivity * 0.1f;
+            float mouseX = Mouse.current.delta.x.ReadValue() * sensitivity * 0.01f;
+            float mouseY = Mouse.current.delta.y.ReadValue() * sensitivity * 0.01f;
             return new Vector3(
                 mouseX * (invertX ? -1 : 1),
                 mouseY * (invertY ? -1 : 1),
@@ -101,11 +99,11 @@ public class GyroParallax : MonoBehaviour
         return Vector3.zero;
     }
 
-    private Vector3 ApplyLimits(Vector3 position)
+    private Vector3 ApplyLimits(Vector3 movement)
     {
-        position.x = Mathf.Clamp(position.x, -maxOffset.x, maxOffset.x);
-        position.y = Mathf.Clamp(position.y, -maxOffset.y, maxOffset.y);
-        return position;
+        movement.x = Mathf.Clamp(movement.x, -maxOffset.x, maxOffset.x);
+        movement.y = Mathf.Clamp(movement.y, -maxOffset.y, maxOffset.y);
+        return movement;
     }
 
     private void ApplyParallaxEffect(Vector3 movement)
@@ -119,7 +117,11 @@ public class GyroParallax : MonoBehaviour
         {
             if (parallaxLayers[i] != null)
             {
-                parallaxLayers[i].localPosition = initialLayerPositions[i] + movement * layerMultipliers[i];
+                // Обновляем текущее смещение с учетом множителя слоя
+                currentLayerOffsets[i] = movement * layerMultipliers[i];
+                
+                // Применяем смещение к начальной позиции
+                parallaxLayers[i].localPosition = initialLayerPositions[i] + currentLayerOffsets[i];
             }
         }
     }
@@ -141,45 +143,42 @@ public class GyroParallax : MonoBehaviour
     }
 
     private void OnGUI()
-{
-    GUIStyle overlayStyle = new GUIStyle(GUI.skin.label)
     {
-        fontSize = Screen.width / 50,
-        normal = { textColor = Color.white },
-        padding = new RectOffset(10, 10, 10, 10)
-    };
-
-    // Создаем полупрозрачный фон
-    Texture2D bgTex = new Texture2D(1, 1);
-    bgTex.SetPixel(0, 0, new Color(0, 0, 0, 0.5f));
-    bgTex.Apply();
-    GUI.DrawTexture(new Rect(10, 10, 500, 250), bgTex);
-
-    GUILayout.BeginArea(new Rect(20, 20, 480, 230));
-    
-    GUILayout.Label($"🧭 Гироскоп: {(AttitudeSensor.current != null ? "Доступен" : "Нет")}", overlayStyle);
-
-    GUILayout.Label($"🧭 Sensors Ready: {(sensorsReady)}", overlayStyle);
-
-    if (AttitudeSensor.current != null)
-    {
-        Quaternion attitude = AttitudeSensor.current.attitude.ReadValue();
-        GUILayout.Label($"Attitude: {attitude.eulerAngles}", overlayStyle);
-        GUILayout.Label($"Base Attitude: {baseAttitude.eulerAngles}", overlayStyle);
-    }
-
-    GUILayout.Label($"📦 Смещение: {lastTargetPosition}", overlayStyle);
-
-    if (parallaxLayers != null)
-    {
-        for (int i = 0; i < Mathf.Min(parallaxLayers.Length, 3); i++) // первые 3 слоя
+        GUIStyle overlayStyle = new GUIStyle(GUI.skin.label)
         {
-            if (parallaxLayers[i] != null)
-                GUILayout.Label($"Слой {i}: {parallaxLayers[i].localPosition}", overlayStyle);
+            fontSize = Screen.width / 50,
+            normal = { textColor = Color.white },
+            padding = new RectOffset(10, 10, 10, 10)
+        };
+
+        Texture2D bgTex = new Texture2D(1, 1);
+        bgTex.SetPixel(0, 0, new Color(0, 0, 0, 0.5f));
+        bgTex.Apply();
+        GUI.DrawTexture(new Rect(10, 10, 500, 250), bgTex);
+
+        GUILayout.BeginArea(new Rect(20, 20, 480, 230));
+        
+        GUILayout.Label($"🧭 Гироскоп: {(AttitudeSensor.current != null ? "Доступен" : "Нет")}", overlayStyle);
+        GUILayout.Label($"🧭 Sensors Ready: {(sensorsReady)}", overlayStyle);
+
+        if (AttitudeSensor.current != null)
+        {
+            Quaternion attitude = AttitudeSensor.current.attitude.ReadValue();
+            GUILayout.Label($"Attitude: {attitude.eulerAngles}", overlayStyle);
+            GUILayout.Label($"Base Attitude: {baseAttitude.eulerAngles}", overlayStyle);
         }
+
+        GUILayout.Label($"📦 Смещение: {lastTargetPosition}", overlayStyle);
+
+        if (parallaxLayers != null)
+        {
+            for (int i = 0; i < Mathf.Min(parallaxLayers.Length, 3); i++)
+            {
+                if (parallaxLayers[i] != null)
+                    GUILayout.Label($"Слой {i}: {parallaxLayers[i].localPosition}", overlayStyle);
+            }
+        }
+
+        GUILayout.EndArea();
     }
-
-    GUILayout.EndArea();
-}
-
 }
